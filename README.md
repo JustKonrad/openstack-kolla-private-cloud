@@ -6,6 +6,46 @@ Everything in this repo is what we really ran. The screenshots are from our own 
 
 ![Horizon overview](docs/screenshots/03-horizon-overview.png)
 
+## What this does
+
+OpenStack is basically your own AWS, running on your own servers. Instead of renting VMs, networks and disks from a cloud provider, you install the software that provides them, and then users can create those resources themselves from a web dashboard or an API, just like on a public cloud.
+
+OpenStack is made of separate services that each do one job:
+
+| Service | What it does | AWS equivalent |
+|---|---|---|
+| Keystone | users, projects, logins and tokens | IAM |
+| Nova (+ Placement) | creates the VMs and picks which server runs them | EC2 |
+| Glance | stores the OS images the VMs boot from | AMIs |
+| Neutron | private networks, routers, IPs, security groups | VPC |
+| Cinder | disks you can attach to VMs | EBS |
+| Heat | infrastructure from templates | CloudFormation |
+| Horizon | the web dashboard | the AWS console |
+
+Installing all of that by hand is long and painful. **Kolla-Ansible** does it for you: every service runs in its own Docker container, and Ansible deploys and configures those containers on each server based on an inventory (which server does what) and one config file (`globals.yml`).
+
+So the flow of this project is:
+
+```
+  3 Ubuntu servers (controller, compute, storage)
+            │
+            ▼
+  scripts/ ── prepare the nodes, install Kolla-Ansible, deploy
+            │
+            ▼
+  a working private cloud: API + Horizon dashboard
+            │
+            ▼
+  lab/ ── use it like a cloud: projects, users, networks, VMs, volumes, scheduling
+```
+
+1. The **controller** runs the "brain" of the cloud: the APIs, the database, the scheduler, the network services and the dashboard.
+2. The **compute** node is where the virtual machines actually run.
+3. The **storage** node provides the disks (Cinder volumes) that get attached to those VMs.
+4. Once it's deployed, the `lab/` scripts use the cloud the way a team would: create a project and users, build networks, launch VMs, attach volumes and control where VMs get placed.
+
+The details of each step are below.
+
 ## Repository layout
 
 ```
