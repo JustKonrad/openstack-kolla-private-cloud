@@ -1,0 +1,23 @@
+# Top of /etc/kolla/multinode.
+# We started from the multinode example shipped with kolla-ansible and only changed
+# the groups below. Everything after [deployment] is the default file, unchanged.
+
+[control]
+controller01 ansible_host=192.168.200.100 ansible_user=kolla ansible_become=true ansible_ssh_private_key_file=~/.ssh/id_rsa
+
+[network]
+controller01
+
+[compute]
+compute01 ansible_host=192.168.200.120 ansible_user=kolla ansible_become=true ansible_ssh_private_key_file=~/.ssh/id_rsa
+# A second compute node was planned but not used in the end.
+# compute02 ansible_host=192.168.200.121 ansible_user=kolla ansible_become=true ansible_ssh_private_key_file=~/.ssh/id_rsa
+
+[monitoring]
+controller01
+
+[storage]
+stockage01 ansible_host=192.168.200.200 ansible_user=kolla ansible_become=true ansible_ssh_private_key_file=~/.ssh/id_rsa
+
+[deployment]
+localhost ansible_connection=local
